@@ -44,6 +44,7 @@ Docker uses a Configuration file called Dockerfile to provision your app. Think 
 For your local setup, you do not need any web server such as [Phusion Passenger](https://www.phusionpassenger.com/) and the Webrick or Puma local server is enough. Below a simplified example of a Dockerfile for our app.
 
 Dockerfile
+
 ```
 FROM ruby:2.3
 
@@ -74,6 +75,7 @@ Therefore, we use docker-compose to manage our local containers depedencies. Doc
 Below the docker-compose file from our current example, a rails 5 app with MySQL.
 
 docker-compose.yml
+
 ```
 version: '2'
 services:
@@ -129,6 +131,7 @@ And if any code change was found:
 Instead of using Ruby base image, we will now use a Docker image provided by Passenger. The documentation can be found here: https://github.com/phusion/passenger-docker
 
 The Dockerfile now looks the following:
+
 ```
 # (1) Using a different base-image
 FROM phusion/passenger-ruby23:0.9.19
@@ -157,8 +160,11 @@ You notice two differences with the previous Dockerfile.
 (2) by default, Passenger advises you to run Nginx as well for serving your static assets (JS, images, CSS, html)
 (3) The cmd used to start the server is different (and provided by the documentation). We will explore why later.
 
-You can also change the command option in the docker-compose file to 
-```command: ["/sbin/my_init"]```
+You can also change the command option in the docker-compose file to
+
+```
+command: ["/sbin/my_init"]
+```
 
 
 
@@ -171,6 +177,7 @@ ADD docker/myapp.conf /etc/nginx/sites-enabled/default.conf
 ```
 
 docker/myapp.conf
+
 ```
 server {
     listen 80;
