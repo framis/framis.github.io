@@ -7,9 +7,11 @@ categories: ruby
 
 In my current job, we moved a Ruby on Rails app from a classic Ubuntu hosting in a private instance to Docker on Kubernetes. We will see the steps in this article:
 
-- Migrating the local environment from Vagrant to Docker
-- Using Continuous Delivery with Jenkins
-- Running the Docker image with Kubernetes
+* Migrating the local environment from Vagrant to Docker
+* Using Continuous Delivery with Jenkins
+* Running the Docker image with Kubernetes
+
+<!--more-->
 
 Migrating the local environment from Vagrant to Docker
 ----------------------------
@@ -19,11 +21,12 @@ We used [Vagrant](https://www.vagrantup.com/) locally in order to load the app w
 ### Vagrant
 
 The main advantages of Vagrant is that a new developer working on the app can spawn a working app in a few minutes in a local Ubunutu Virtual Machine with all its dependencies regardless the dev environment he is using (MacOS like us, Linux or Windows). We used [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage our VMs. The direct depedencies were:
-- A specific Ruby version
-- A specific Rails version
-- MySQL
-- RabbitMQ
-- Other gems as mentionned in the Gemfile
+
+* A specific Ruby version
+* A specific Rails version
+* MySQL
+* RabbitMQ
+* Other gems as mentionned in the Gemfile
 
 Vagrant is especially useful to start the Database and RabbitMQ locally run functional tests.
 
@@ -75,7 +78,7 @@ Below the docker-compose file from our current example, a rails 5 app with MySQL
 
 docker-compose.yml
 
-```
+```yml
 version: '2'
 services:
   mysql:  
@@ -104,7 +107,7 @@ services:
 
 Basically, we create a first mysql container with a sample db and we link to our web container. The web app is exposed on port 3000 and accessible from http://your-docker-ip:3000/. Pay attention to the links: -mysql that will link your app to your running mysql container (by pointing mysql to the correct destination in the /etc/hosts of the web container).
 
-The full example is available [here](https://github.com/francoismisslin/rails-docker/tree/master/rails-docker-simple).
+The full example is available [here](https://github.com/framis/rails-docker/tree/master/rails-docker-simple).
 
 ### Using a Phusion Passenger server
 
@@ -112,18 +115,21 @@ Your production setup will hopefully use a ruby webserver such as [Phusion Passe
 
 #### Before, we used Chef
 
-Before migrating to Docker in production, we used [Chef](https://www.chef.io/) to provision our production VM. The Chef recipes were running every 30min and were responsible for the following things:
-- install ubunutu to the VM and common security and logging modules to all Revinate's apps
-- install ruby
-- install linux depedencies with apt-get
-- install ruby dependencies with bundle
-- install phusion passenger with nginx
-- configure Nginx
-- pull code from Github
-And if any code change was found:
-- precompile the assets
-- migrate the DB
-- (re)start the webserver and all associated worker jobs
+Before migrating to Docker in production, we used [Chef](https://www.chef.io/) to provision our production VM. The Chef recipes were running every 30min and were responsible for the following things :
+
+* install ubunutu to the VM and common security and logging modules to all Revinate's apps
+* install ruby
+* install linux depedencies with apt-get
+* install ruby dependencies with bundle
+* install phusion passenger with nginx
+* configure Nginx
+* pull code from Github
+
+And if any code change was found :
+
+* precompile the assets
+* migrate the DB
+* (re)start the webserver and all associated worker jobs
 
 #### With Docker
 
@@ -131,7 +137,7 @@ Instead of using Ruby base image, we will now use a Docker image provided by Pas
 
 The Dockerfile now looks the following:
 
-```
+```Dockerfile
 # (1) Using a different base-image
 FROM phusion/passenger-ruby23:0.9.19
 
@@ -155,9 +161,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /var/tmp/* /tmp/* /usr/src/app/
 ```
 
 You notice two differences with the previous Dockerfile.
-(1) we now use a different base-image, provided by Phusion. I provided an explicit version (0.9.19), so that we do not pull the latest
-(2) by default, Passenger advises you to run Nginx as well for serving your static assets (JS, images, CSS, html)
-(3) The cmd used to start the server is different (and provided by the documentation). We will explore why later.
+
+* (1) we now use a different base-image, provided by Phusion. I provided an explicit version (0.9.19), so that we do not pull the latest
+* (2) by default, Passenger advises you to run Nginx as well for serving your static assets (JS, images, CSS, html)
+* (3) The cmd used to start the server is different (and provided by the documentation). We will explore why later.
 
 You can also change the command option in the docker-compose file to
 

@@ -8,5 +8,5 @@ Avidly curious. I started coding at 12, one year after I got my first computer. 
 
 I am currently lead software engineer at Revinate, inc in San Francisco in Distributed Systems and Data Ingestion.
 
-[Linkedin](https://www.linkedin.com/in/francoismisslin)
+[Linkedin](https://www.linkedin.com/in/framis)
 [Github](https://github.com/framis)
