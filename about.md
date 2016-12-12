@@ -4,12 +4,9 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+Avidly curious. I started coding at 12, one year after I got my first computer. I released a website in Php called allyrics.com at 13, one year after I got my first Internet connection. Since then, I taught myself a dozen different programming languages.
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jglovier" %} /
-[jekyll-new](https://github.com/jglovier/jekyll-new)
+I am currently lead software engineer at Revinate, inc in San Francisco in Distributed Systems and Data Ingestion.
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+[Linkedin](https://www.linkedin.com/in/francoismisslin)
+[Github](https://github.com/framis)
