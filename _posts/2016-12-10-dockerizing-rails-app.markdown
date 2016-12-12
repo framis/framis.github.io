@@ -11,7 +11,6 @@ In my current job, we moved a Ruby on Rails app from a classic Ubuntu hosting in
 - Using Continuous Delivery with Jenkins
 - Running the Docker image with Kubernetes
 
-
 Migrating the local environment from Vagrant to Docker
 ----------------------------
 
