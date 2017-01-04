@@ -18,7 +18,7 @@ layout: default
     <br/>
     <br/>
     <div>
-      {{'result' | angular}}
+      [[result]]
     </div>
   </div>  
 </div>
@@ -28,7 +28,10 @@ layout: default
 <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.angular.min.js"></script>
 <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.angular.min.js"></script>
 <script type="text/javascript">
-  angular.module('city', ['algoliasearch', 'algolia.autocomplete'])
+  angular.module('city', ['algoliasearch', 'algolia.autocomplete'], function($interpolateProvider) {
+    $interpolateProvider.startSymbol('[[');
+    $interpolateProvider.endSymbol(']]');
+  })
     .controller('searchCities', ['$scope', 'algolia', function($scope, algolia) {
       var client = algoliasearch("W43TB35Y1F", "a3b398527a2ed42d37b9d3748553a275");
       var index = client.initIndex('cities');
