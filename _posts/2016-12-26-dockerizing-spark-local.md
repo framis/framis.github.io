@@ -141,6 +141,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3")
 And use a build.sbt like the folling:
 
 ```scala
+// build.sbt
 val sparkVersion = "2.0.2"
 
 lazy val root = (project in file(".")).
@@ -170,5 +171,4 @@ The assembly task might be pretty slow. Therefore, for development, the spark-sh
 
 I tried to use a library [algolia-search-client](https://github.com/algolia/algoliasearch-client-scala/) on Spark which explicitely depends on json4s version 3.4.0. Unfortunaltely, Spark#2.0.2 depends on json4s version 3.2.11 and those binaries are incompatible as stated [here](https://github.com/json4s/json4s/issues/316). An alternative solution would have been to rebuild spark with json4s version 3.4.0 but it does not seem like a viable solution, especially for production.
 
-
-
+You can find a full example in the following repo: [framis/geonames-spark](https://github.com/framis/geonames-spark)
