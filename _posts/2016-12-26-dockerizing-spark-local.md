@@ -23,7 +23,8 @@ This Docker image has all we need: https://github.com/P7h/docker-spark
 
 Personnally, I do not like depending on someone else's Dockerfile, especially when it is unofficial and so simple. Below, the adapted version I use. 
 
-```
+```bash
+# Dockerfile
 FROM openjdk:8
 
 # Adapted from https://github.com/P7h/docker-spark
@@ -76,7 +77,8 @@ A few remarks:
 
 In order to run the container, you can either run docker command directly or use docker-compose. Below, an example of docker-compose:
 
-```
+```yml
+# docker-compose.yml
 version: '2'
 services:
   spark:
@@ -93,26 +95,25 @@ Using the current directory as the volume will make it easy rebuild the project 
 
 ANd to get started, run:
 
-```
+```bash
  docker-compose run spark
 ```
 
 From within the container, you can now run a sample Spark Job:
 
-```
+```bash
 spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples*.jar 100
-
 ```
 
 or use the shell:
 
-```
+```bash
 spark-shell
 ```
 
 or run and expose a master or slave spark server to respectively port 8080 or port 8081
 
-```
+```bash
 start-master.sh
 start-slave.sh
 ```
@@ -133,13 +134,13 @@ For more complex projects you might need more dependencies than just the standar
 
 Basically, you need to add to project/assembly.sbt the following line
 
-```
+```bash
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3")
 ```
 
 And use a build.sbt like the folling:
 
-```
+```scala
 val sparkVersion = "2.0.2"
 
 lazy val root = (project in file(".")).

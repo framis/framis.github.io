@@ -18,3 +18,5 @@ github_username: framis
 # Build settings
 markdown: kramdown
 excerpt_separator: <!--more-->
+kramdown:
+  input: GFM # See https://help.github.com/categories/writing-on-github/

@@ -47,7 +47,7 @@ For your local setup, you do not need any web server such as [Phusion Passenger]
 
 Dockerfile
 
-```
+```bash
 FROM ruby:2.3
 
 RUN mkdir -p /usr/src/app
@@ -137,7 +137,7 @@ Instead of using Ruby base image, we will now use a Docker image provided by Pas
 
 The Dockerfile now looks the following:
 
-```Dockerfile
+```bash
 # (1) Using a different base-image
 FROM phusion/passenger-ruby23:0.9.19
 
@@ -168,7 +168,7 @@ You notice two differences with the previous Dockerfile.
 
 You can also change the command option in the docker-compose file to
 
-```
+```bash
 command: ["/sbin/my_init"]
 ```
 
@@ -178,13 +178,13 @@ For production, you will use a different Nginx configuration.
 
 You can override /etc/nginx/nginx.conf and /etc/nginx/sites-enabled/default.conf with you custom file. For instance, I have added a docker/myapp.conf file in my app and use the following line in the Dockerfile
 
-```
+```bash
 ADD docker/myapp.conf /etc/nginx/sites-enabled/default.conf
 ```
 
 docker/myapp.conf
 
-```
+```bash
 server {
     listen 80;
     server_name "_";
