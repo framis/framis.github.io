@@ -2,7 +2,7 @@
 layout: post
 title:  "Getting started with Spark and Docker"
 date:   2016-12-26 08:00:00 -0700
-categories: spark, docker
+categories: spark
 ---
 
 Spark is a very nice framework processing a large amount of data. In this article, we will see the caveats to have spark running locally with Docker.
@@ -12,14 +12,14 @@ Spark is a very nice framework processing a large amount of data. In this articl
 The Dockerfile
 --------------
 
-Unfortunatley for us, Spark's most popular Spark docker image (sequenceiq/spark)[https://hub.docker.com/r/sequenceiq/spark] is outdated and uses Spark 1.6 only. Current version of Spark while writting this article is 2.0.2.
+Unfortunatley for us, Spark's most popular Spark docker image [sequenceiq/spark](https://hub.docker.com/r/sequenceiq/spark) is outdated and uses Spark 1.6 only. Current version of Spark while writting this article is 2.0.2.
 
 A deeper search in dockerhub does not give more relevant results from popular images. Hopefully, Spark is not too hard to install, here are the few dependencies if you want to use spark-scala:
 - Java
 - Scala & sbt
 - Spark & Hadoop
 
-This image has all we need: https://github.com/P7h/docker-spark
+This Docker image has all we need: https://github.com/P7h/docker-spark
 
 Personnally, I do not like depending on someone else's Dockerfile, especially when it is unofficial and so simple. Below, the adapted version I use. 
 
@@ -123,13 +123,13 @@ This is pretty cool. However, if you are building a real project, and if like me
 
 ### Sbt
 
-You can now add a custom project as mentionned in the (Spark Getting Started)[http://spark.apache.org/docs/latest/quick-start.html#self-contained-applications]
+You can now add a custom project as mentionned in the [Spark Getting Started](http://spark.apache.org/docs/latest/quick-start.html#self-contained-applications)
 
-It worked pretty smoothly for me by running sbt package from with the container. However, when using sbt from my computer, I ran into some 'unresolved dependencies' exceptions. Basically there was some dependencies problems with the ivy cache. I managed to resolve the problem by following those instructions from the (sbt dependency management flow tutorial)[http://www.scala-sbt.org/release/docs/Dependency-Management-Flow.html]. Because `sbt update` and `sbt clean` did not give any result, I ended up nuking the ivy cache : `rm -r ~/.ivy2/cache`
+It worked pretty smoothly for me by running sbt package from with the container. However, when using sbt from my computer, I ran into some 'unresolved dependencies' exceptions. Basically there was some dependencies problems with the ivy cache. I managed to resolve the problem by following those instructions from the [sbt dependency management flow tutorial](http://www.scala-sbt.org/release/docs/Dependency-Management-Flow.html). Because `sbt update` and `sbt clean` did not give any result, I ended up nuking the ivy cache : `rm -r ~/.ivy2/cache`
 
 ### Fat JARS
 
-For more complex projects you might need more dependencies than just the standard library. Spark will not include transitive dependencies. Because `sbt package` will not include those dependencies into you JAR, you want to use a plugin such as (sbt-assembly)[https://github.com/sbt/sbt-assembly]. This (stackoverflow answer)[http://stackoverflow.com/questions/28459333/how-to-build-an-uber-jar-fat-jar-using-sbt-within-intellij-idea] has been pretty helpful as well.
+For more complex projects you might need more dependencies than just the standard library. Spark will not include transitive dependencies. Because `sbt package` will not include those dependencies into you JAR, you want to use a plugin such as [sbt-assembly](https://github.com/sbt/sbt-assembly). This [stackoverflow answer](http://stackoverflow.com/questions/28459333/how-to-build-an-uber-jar-fat-jar-using-sbt-within-intellij-idea) has been pretty helpful as well.
 
 Basically, you need to add to project/assembly.sbt the following line
 
@@ -167,7 +167,7 @@ Also note the difference between %% (dependency built with sbt) and %.
 
 The assembly task might be pretty slow. Therefore, for development, the spark-shell might be very helpful. When using the shell, do not forget to point to dependencies in the --package option.
 
-I tried to use a library (algolia-search-client)[https://github.com/algolia/algoliasearch-client-scala/] on Spark which explicitely depends on json4s version 3.4.0. Unfortunaltely, Spark#2.0.2 depends on json4s version 3.2.11 and those binaries are incompatible as stated (here)[https://github.com/json4s/json4s/issues/316]. An alternative solution would have been to rebuild spark with json4s version 3.4.0 but it does not seem like a viable solution, especially for production.
+I tried to use a library [algolia-search-client](https://github.com/algolia/algoliasearch-client-scala/) on Spark which explicitely depends on json4s version 3.4.0. Unfortunaltely, Spark#2.0.2 depends on json4s version 3.2.11 and those binaries are incompatible as stated [here](https://github.com/json4s/json4s/issues/316). An alternative solution would have been to rebuild spark with json4s version 3.4.0 but it does not seem like a viable solution, especially for production.
 
 
 
