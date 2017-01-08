@@ -5,20 +5,20 @@ date:   2016-12-26 08:00:00 -0700
 categories: geoname
 ---
 
-[Geoname](http://www.geonames.org/) is an open-source dataset containing more than 11 million places, including country informations.
+[Geoname](http://www.geonames.org/) is an open-source dataset containing more than 11 million places.
 
-In this article, we will see how we can leverage this dataset to get the list of the cities in the world merged with some additionnal data, such as the postalCodes. 
+In this article, we will see how we can leverage this dataset to get the list of the cities in the world merged with some additionnal data, such as country, region and postalCodes.
 
 <!--more-->
 
 # The problem
 
-The data we are going to import is located into different files:
+The data we are going to import is located in different files:
 
 * allCountries.zip -> that unzips to allCountries.txt
 * or XX.zip where zip is the country code, ex: US.zip
 
-The places are in CSV format but it lack most useful information. The country is represented by its two letter code. The administrative information (state, region, etc) are represented by a code. The postalCode information is missing.
+The places are in CSV format but it lacks most useful information. The country is represented by a two letter ISO code. The administrative information (state, region, etc) is represented by a code. The postalCode is missing.
 
 Therefore, we will need to get relevant data from other files and perform relevant joins:
 
@@ -29,7 +29,7 @@ Therefore, we will need to get relevant data from other files and perform releva
 
 ## Simple approach with a Shell script
 
-Most people who are dealing with Geonames data use a simple shell script and save data in a RDBMS such as MySQL or PostgreSQL (useful if your are using postgis plugin for geolocation).
+Most people who are dealing with Geonames data use a simple shell script and save data in a RDBMS such as MySQL or PostgreSQL (PostgreSQL useful if your are using the Postgis plugin for geolocation).
 
 A good source of information is:
 http://codigofuerte.github.io/GeoNames-MySQL-DataImport/
@@ -40,22 +40,22 @@ Once the data is imported into your local database, you can use your favorite cl
 
 The main advantage of this approach is its simplicity.
 
-The main drawback is that you are tied to have a RDBMS for performing your data-processing, which is not very scalable. Moreover, you will need to build complex joins and your SQL queries will get inefficient and complex.
+The main drawback is that you are tied to a RDBMS for performing your data-processing, which is not very scalable. Moreover, you will need to build complex joins and your SQL queries will get inefficient and complex.
 
 That's why most people actually use a programming language to perform the data-processing such as Foursquare's [twofishes](https://github.com/foursquare/fsqio/tree/master/src/jvm/io/fsq/twofishes) in scala
 
 ## Data Processing with Go
 
-I could have used Python or Scala but I chose Golang. I am pretty fond of Communicating Sequential Processes framework popularized by Hoare (more info [book here](http://usingcsp.com/cspbook.pdf), [research article here](http://fi.ort.edu.uy/innovaportal/file/20124/1/55-hoare_csp_old_article.pdf)). Golang channels and goroutines makes it easy to implement.
+I could have used Python or Scala but I chose Golang. I am pretty fond of Communicating Sequential Processes (CSP) framework popularized by Hoare (more info [book here](http://usingcsp.com/cspbook.pdf), [research article here](http://fi.ort.edu.uy/innovaportal/file/20124/1/55-hoare_csp_old_article.pdf)). Golang channels and goroutines makes it easy to implement CSP.
 
 My approach is the following:
 
-* download parse the CSV files and load into memory small datasets useful for joins: countryInfo, admin1CodesASCII, admin2Codes and store the data in a Map where the key is the field used for joining the data (2 letter ISO code for country, and code for admin1CodesASCII and admin2Codes).
-* download and unzip the geoname file (316M and unzipped more than 1G)
-* process the file line by line in a streaming fashing using channels. Each line is sent a channel.
+* download and parse the CSV files and load into memory the small datasets useful for joins: countryInfo, admin1CodesASCII, admin2Codes and store the data in a Map where the key is the field used for joining the data (2 letter ISO code for country, and code for admin1CodesASCII and admin2Codes).
+* download and unzip the geoname file (316M, unzipped more than 1G)
+* process the file line by line in a streaming fashion using channels.
 * the line is parsed from csv to a slice
 * the slice is mapped to a struct
-* the struct is validated and filtered to keep cities only (there is a 'P' class field, doc [here](http://www.geonames.org/export/codes.html))
+* the struct is validated and filtered out to keep cities only (there is a 'P' class field, doc [here](http://www.geonames.org/export/codes.html))
 * because there are still many invalid places we do further processing: we keep only places with a population > 0 (we realized that the population field is reliably > 0 for actual cities), and we use hierarchy.zip to fix a few more duplicates (some cities are multiple times in the file, for instance Marseille and its arrondissement in France)
 * the City struct is enriched with country, Administrative1 and 2 and postalCode data
 * the City can undergo further processing if needed, for instance it can be crossed checked manually or with another data-source
@@ -66,17 +66,17 @@ You can find a quick and dirty version of the code at [framis/gocity](https://gi
 
 A few remarks, I am downloading and unzipping the file with Go code. I could also use a shell script instead. However, doing everything in Go reduces the number of dependencies.
 
-We would have benefitted a lot to get a datasource gzipped instead of zipped. We could have unzipped it in a streaming fashion without having to download and unzip the full file. The data-processing pipeline would have been much faster.
+We would have benefitted a lot to get a datasource gzipped instead of zipped. We could have unzipped it in a streaming fashion without having to download and unzip the full file. The data-processing pipeline would have been much more efficient.
 
 We use Goroutines to handle downloads and data-processing in parallel to avoid I/O wait.
 
-This approach allow the better customization but we are pretty much reinventing the wheel if the use-case is simple. Our use-case is too complex for the shell scripting approach, but not compelx enough to require building a software form scratch. Therefore, the last approach leverage Spark framework that is really good to process data at large scale.
+This approach allow the better customization but we are pretty much reinventing the wheel if the use-case is simple. Our use-case is too complex for the shell scripting approach, but not complex enough to require building a software form scratch. Therefore, the last approach leverage Spark Framework.
 
 ## Using Spark
 
-As we saw before, the Golang approach is highly scalable but requires a decent number of LOC. I am not even including tests, which I should.
+As we saw before, the Golang approach is highly scalable but requires a decent number of LOC and it really feels like we are re-inventing the wheel.
 
-Spark framework is super good at importing data from various data-sources and performing distributed joins. This is exactly our use-case here.
+Spark framework is super good at importing data from various data-sources and performing distributed joins. This is exactly our use-case.
 
 Moreover, the Dataframe API offers a good high-level API that is much easier to understand that custom golang code. It also offers a good client for developping and testing the code as well as many hosting solutions for production use.
 
@@ -223,16 +223,19 @@ object SimpleApp {
 
     cities.createOrReplaceTempView("cities")
 
-    // DATA INTEGRITY TEST
+    // DATA INTEGRITY TEST, ADD MORE BELOW
     val frenchCities = cities.filter($"country_code"==="FR").cache()
     assert(frenchCities.count() > 33000 && frenchCities.count() < 36000, "French cities count should be between 33000 and 36000")
 
+    // YOU CAN CREATE A VIEW FOR MANUAL QA
     sqlContext.sql("SELECT * FROM cities WHERE name='Paris'").show()
 
     sc.stop()
   }
 }
 ```
+
+First of all, using notebooks such as Zepplin or spark-shell makes it very easy to build your programm and play with the data. You can easily cache the result and perform a few manual queries to see how things go.
 
 You can of course add more data integrity tests. Another approach would be to use newer Dataset api instead of Dataframes, so that the data is typed and to avoid such lines `.dropDuplicates(Seq("name", "country", "admin1_code"))` with hard-coded column names.
 
