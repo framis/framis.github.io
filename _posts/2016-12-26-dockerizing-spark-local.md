@@ -171,6 +171,4 @@ Also note the difference between %% (dependency built with sbt) and %.
 
 The assembly task might be pretty slow. Therefore, for development, the spark-shell might be very helpful. When using the shell, do not forget to point to dependencies in the --package option.
 
-I tried to use a library [algolia-search-client](https://github.com/algolia/algoliasearch-client-scala/) on Spark which explicitely depends on json4s version 3.4.0. Unfortunaltely, Spark#2.0.2 depends on json4s version 3.2.11 and those binaries are incompatible as stated [here](https://github.com/json4s/json4s/issues/316). An alternative solution would have been to rebuild spark with json4s version 3.4.0 but it does not seem like a viable solution, especially for production.
-
 You can find a full example in the following repo: [framis/geonames-spark](https://github.com/framis/geonames-spark)
