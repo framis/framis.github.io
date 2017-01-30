@@ -12,6 +12,7 @@ Let's see how to do a batch insert.
 <!--more-->
 
 Let's first bulk index data. According to the documentation [ES 1.x](https://www.elastic.co/guide/en/elasticsearch/guide/1.x/bulk.html) or [ES 2.x](https://www.elastic.co/guide/en/elasticsearch/guide/current/bulk.html)
+
 ```bash
 curl -XPOST 'localhost:9200/_bulk?pretty' -H 'Content-Type: application/json' -d'
 { "index":  { "_index": "hello", "_type": "doc" }}
@@ -22,6 +23,7 @@ curl -XPOST 'localhost:9200/_bulk?pretty' -H 'Content-Type: application/json' -d
 ```
 
 You can find the 2 documents that have been created.
+
 ```bash
 curl -XGET 'localhost:9200/hello/_search?pretty'
 > {
@@ -64,7 +66,10 @@ The response can be a little bit ugly because of all the metadata. Here comes [j
 Let's say you just want to get the titles:
 
 ```bash
-curl -XGET 'localhost:9200/hello/_search?pretty' | jq '.hits.hits[] | {title:._source.title}' -c
+curl -XGET 'localhost:9200/hello/_search' | 
+jq '.hits.hits[] | 
+{title:._source.title}' -c
+
 > {"title":"Hello world"}
 {"title":"Hello world 2"}
 ```
@@ -72,18 +77,31 @@ curl -XGET 'localhost:9200/hello/_search?pretty' | jq '.hits.hits[] | {title:._s
 The -c option inlines the output. Note that it does not return an array but several lines of JSON, which will be handy later.
 
 Now let's say you want to update the titles and replace 'world' by 'Everyone':
+
 ```bash
-curl -XGET 'localhost:9200/hello/_search?pretty' | jq '.hits.hits[] | { "index":  {_index, _type, _id }}, ._source' -c | sed 's/world/Everyone/g' | curl -XPOST http://localhost:9200/_bulk --data-binary @-
+curl -XGET 'localhost:9200/hello/_search' | 
+jq '.hits.hits[] | 
+{ "index":  {_index, _type, _id }}, ._source' -c | 
+sed 's/world/Everyone/g' | 
+curl -XPOST http://localhost:9200/_bulk --data-binary @-
 ```
 
 The 'create' verb is useful if you want to create a document only if it does not exists in the index. For instance, you can easily copy data from one index to another and even from one cluster to another:
+
 ```bash
-curl -XGET 'localhost:9200/hello/_search?pretty' | jq '.hits.hits[] | { "create":  {_index:"new", _type, _id }}, ._source' -c | curl -XPOST http://localhost:9200/_bulk --data-binary @-
+curl -XGET 'localhost:9200/hello/_search' | 
+jq '.hits.hits[] | 
+{ "create":  {_index:"new", _type, _id }}, ._source' -c | 
+curl -XPOST http://localhost:9200/_bulk --data-binary @-
 ```
 
 or perform a batch delete:
+
 ```bash
-curl -XGET 'localhost:9200/hello/_search?pretty' | jq '.hits.hits[] | { "delete":  {_index:"new", _type, _id }}' -c | curl -XPOST http://localhost:9200/_bulk --data-binary @-
+curl -XGET 'localhost:9200/hello/_search' | 
+jq '.hits.hits[] | 
+{ "delete":  {_index:"new", _type, _id }}' -c | 
+curl -XPOST http://localhost:9200/_bulk --data-binary @-
 ```
 
 All these operations can be pretty handly if you need to perform not 2 updates but 100 000. I did a test to bulk create 100K documents and it just took a few minutes, depending of course of the speed of your connection if accessing a remote cluster and the characteristics of your cluster.
