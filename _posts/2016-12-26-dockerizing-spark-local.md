@@ -5,7 +5,9 @@ date:   2016-12-26 08:00:00 -0700
 categories: spark
 ---
 
-Spark is a very nice framework processing a large amount of data. In this article, we will see the caveats to have spark running locally with Docker.
+Spark is a very nice framework for processing a large amount of data. In this article, we will see the caveats to have spark running locally with Docker. Why it is useful? Spark requires a few dependencies: Java, Scala, Hadoop and the Spark Jar and CLI, which of those could have conflicting versions, especially if installed globally on your  machine. Therefore, after a few months without using your app it is not uncommon that everything breaks.
+
+Having all those components in a bundled local docker image will ensure that everything is working as is, on someone else's computer or in your computer a few months from now.
 
 <!--more-->
 
